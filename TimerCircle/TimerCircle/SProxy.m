@@ -9,7 +9,11 @@
 #import "SProxy.h"
 
 /**
- SProxy 并不会拥有 NSTimer
+ 继承自 NSObject 的类，对象调用方法的流程是：
+
+ 1.消息发送
+ 2.动态方法解析
+ 3.消息转发
  */
 @implementation SProxy
 

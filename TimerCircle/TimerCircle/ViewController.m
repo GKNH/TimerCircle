@@ -8,10 +8,9 @@
 
 #import "ViewController.h"
 #import "SProxy.h"
+#import "SProxy2.h"
 
-/**
- SProxy 作为 target 执行 timerTest 方法
- */
+
 @interface ViewController ()
 
 @property (nonatomic, strong) CADisplayLink *link;
@@ -23,22 +22,39 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-     
+//    [self invokeDisplayLink];
+    [self invokeTimer];
+//    [self invokeTimerWithBlock];
+    
+}
+/**
+  使用第三方的方案规避循环引用
+  当前方法初始化定时器，定时器不会被自动添加到当前RunLoop中
+*/
+- (void)invokeDisplayLink {
+  
     // CADisplayLink 保证调用频率和屏幕的刷帧频率一致，60FPS
-//    self.link = [CADisplayLink displayLinkWithTarget:[SProxy proxyWithTarget:self] selector:@selector(linkTest)];
-//    [self.link addToRunLoop:[NSRunLoop mainRunLoop] forMode:NSDefaultRunLoopMode];
+    self.link = [CADisplayLink displayLinkWithTarget:[SProxy2 proxyWithTarget:self] selector:@selector(linkTest)];
+    [self.link addToRunLoop:[NSRunLoop mainRunLoop] forMode:NSDefaultRunLoopMode];
+}
+/**
+ 使用第三方的方案规避循环引用
+ 当前方法初始化定时器，定时器会被自动添加到当前RunLoop中
+*/
+- (void)invokeTimer {
     
-    // 自动加到当前TRunLoop中
-//    self.timer = [NSTimer scheduledTimerWithTimeInterval:1.0 target:[SProxy proxyWithTarget:self] selector:@selector(timerTest) userInfo:nil repeats:YES];
-    
+    self.timer = [NSTimer scheduledTimerWithTimeInterval:1.0 target:[SProxy2 proxyWithTarget:self] selector:@selector(timerTest) userInfo:nil repeats:YES];
+}
+/**
+  使用弱引用加Block的方式，规避循环引用
+*/
+- (void)invokeTimerWithBlock {
     // 弱引用
     __weak typeof (self)  weakSelf = self;
     // 使用block初始化定时器
     self.timer = [NSTimer scheduledTimerWithTimeInterval:1.0 repeats:YES block:^(NSTimer * _Nonnull timer) {
         [weakSelf timerTest];
     }];
-    
-    
 }
 
 - (void)timerTest {
