@@ -9,6 +9,7 @@
 #import "SProxy2.h"
 
 /**
+
 Proxy：中间对象，代理
 NSProxy 是专门用做消息转发的基类(NSObject也是基类)
  
